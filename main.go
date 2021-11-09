@@ -11,10 +11,13 @@ import (
 
 func main() {
 	if xmlBytes, err := getXML("http://nas.home.starkenberg.net:32400/library/sections/1/all?X-Plex-Token=7XzynkzVHNjxz5m_pssP"); err != nil {
-		log.Printf("Failed to get XML: %v", err)
+		log.Fatalf("Failed to get XML: %v", err)
 	} else {
 		var result MediaContainer
-		xml.Unmarshal(xmlBytes, &result)
+		err := xml.Unmarshal(xmlBytes, &result)
+		if err != nil {
+			log.Fatalln(err)
+		}
 		for _, v := range result.Video {
 			imdbID := getImdbId(v.Media.Part[0].File)
 			if len(imdbID) > 1 {
@@ -65,7 +68,7 @@ func getXML(url string) ([]byte, error) {
 }
 
 func sendImdbID(imdbID string) {
-	url := fmt.Sprintf("http://localhost:8080/v1/plex/%s", imdbID)
+	url := fmt.Sprintf("https://movies-api.k8s.starkenberg.net/v1/plex/%s", imdbID)
 	resp, err := http.Post(url, "application/json", nil)
 	if err != nil {
 		log.Printf("Error posting to API : %s -> %s", imdbID, err)
@@ -74,5 +77,7 @@ func sendImdbID(imdbID string) {
 	if resp.StatusCode != 201 {
 		log.Printf("Error posting to API : %s", imdbID)
 		log.Printf("Status Code : %d", resp.StatusCode)
+	} else {
+		fmt.Printf("%s sent to api\n", imdbID)
 	}
 }
