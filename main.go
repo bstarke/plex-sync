@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	if xmlBytes, err := getXML("http://nas.home.starkenberg.net:32400/library/sections/1/all?X-Plex-Token=7XzynkzVHNjxz5m_pssP"); err != nil {
+	if xmlBytes, err := getXML("http://plex.home.starkenberg.net:32400/library/sections/1/all?X-Plex-Token=ers5yxqxU7L33xo1doou"); err != nil {
 		log.Fatalf("Failed to get XML: %v", err)
 	} else {
 		var result MediaContainer
@@ -28,21 +28,21 @@ func main() {
 }
 
 func getImdbId(filename string) string {
-	part1 := strings.FieldsFunc(filename, func(r rune) bool {
+	fileNameSlices := strings.FieldsFunc(filename, func(r rune) bool {
 		if r == '{' || r == '}' {
 			return true
 		}
 		return false
 	})
-	if len(part1) > 1 {
-		part2 := strings.FieldsFunc(part1[1], func(r rune) bool {
+	if len(fileNameSlices) > 1 {
+		imdbSlices := strings.FieldsFunc(fileNameSlices[1], func(r rune) bool {
 			if r == '-' {
 				return true
 			}
 			return false
 		})
-		if len(part2) > 1 {
-			return part2[1]
+		if len(imdbSlices) > 1 {
+			return imdbSlices[1]
 		}
 	}
 	return ""
