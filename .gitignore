@@ -16,3 +16,5 @@ plex.xml
 .idea/
 *.iml
 *.db
+
+config.yml

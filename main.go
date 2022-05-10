@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/xml"
 	"fmt"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -10,7 +11,27 @@ import (
 )
 
 func main() {
-	if xmlBytes, err := getXML("http://plex.home.starkenberg.net:32400/library/sections/1/all?X-Plex-Token=ers5yxqxU7L33xo1doou"); err != nil {
+	run()
+}
+
+func setup() {
+	viper.SetEnvPrefix("sync")
+	viper.SetConfigName("config")           // name of config file (without extension)
+	viper.AddConfigPath(".")                // look for config in the working directory
+	viper.AddConfigPath("$HOME/.plex-sync") // call multiple times to add many search paths
+	err := viper.ReadInConfig()             // Find and read the config file
+	if err != nil {                         // Handle errors reading the config file
+		panic(fmt.Errorf("Fatal error config file: %w \n", err))
+	}
+	viper.AutomaticEnv()
+	viper.WatchConfig()
+}
+
+func run() {
+	setup()
+	url := fmt.Sprintf("%s://%s:32400/library/sections/1/all?X-Plex-Token=%s", viper.Get("plex.protocol"),
+		viper.Get("plex.host"), viper.Get("plex.token"))
+	if xmlBytes, err := getXML(url); err != nil {
 		log.Fatalf("Failed to get XML: %v", err)
 	} else {
 		var result MediaContainer
@@ -21,6 +42,7 @@ func main() {
 		for _, v := range result.Video {
 			imdbID := getImdbId(v.Media.Part[0].File)
 			if len(imdbID) > 1 {
+				fmt.Printf("Sending %s to api\n", imdbID)
 				sendImdbID(imdbID)
 			}
 		}
@@ -68,7 +90,7 @@ func getXML(url string) ([]byte, error) {
 }
 
 func sendImdbID(imdbID string) {
-	url := fmt.Sprintf("https://movies-api.k8s.starkenberg.net/v1/plex/%s", imdbID)
+	url := fmt.Sprintf("%s://%s/v1/plex/%s", viper.Get("movies.protocol"), viper.Get("movies.host"), imdbID)
 	resp, err := http.Post(url, "application/json", nil)
 	if err != nil {
 		log.Printf("Error posting to API : %s -> %s", imdbID, err)

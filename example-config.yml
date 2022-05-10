@@ -1,0 +1,8 @@
+plex:
+  protocol: "http"
+  host: "plex.server.local"
+  token: "some-token"
+
+movies:
+  protocol: "https"
+  host: "movies-api.server.local"
