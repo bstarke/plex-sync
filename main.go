@@ -100,6 +100,6 @@ func sendImdbID(imdbID string) {
 		log.Printf("Error posting to API : %s", imdbID)
 		log.Printf("Status Code : %d", resp.StatusCode)
 	} else {
-		fmt.Printf("%s sent to api\n", imdbID)
+		log.Printf("%s sent to api", imdbID)
 	}
 }
