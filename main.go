@@ -7,7 +7,9 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -39,13 +41,33 @@ func run() {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		for _, v := range result.Video {
-			imdbID := getImdbId(v.Media.Part[0].File)
-			if len(imdbID) > 1 {
-				fmt.Printf("Sending %s to api\n", imdbID)
-				sendImdbID(imdbID)
+		updated := 0
+		for _, v := range result.VideoList {
+			//size := float64(0)
+			//for _, part := range v.Media.PartList {
+			//	s, _ := strconv.Atoi(part.Size)
+			//	size += float64(s) / 1024 / 1024 / 1024
+			//}
+			//fmt.Printf("%s (%s) is %.2fGB\n", v.Title, v.Media.VideoResolution, size)
+			//if v.AddedAt < "1661216665" && v.UpdatedAt > "1661216665" && v.Media.VideoResolution != "1080" {
+			//	u, _ := strconv.ParseInt(v.UpdatedAt, 10, 64)
+			//	c, _ := strconv.ParseInt(v.AddedAt, 10, 64)
+			//	fmt.Printf("%50s (%4s)\tCreated on %s\tUpdated on %s\n", v.Title, v.Media.VideoResolution, time.Unix(c, 0).Format("01/02/2006"), time.Unix(u, 0).Format("01/02/2006"))
+			//	updated++
+			//}
+			//if v.Media.VideoResolution != "1080" {
+			//	updated++
+			//	fmt.Printf("%-60v (%3s)\n", v.Title, v.Media.VideoResolution)
+			//}
+			if v.UpdatedAt > "1661216665" {
+				updated++
+				u, _ := strconv.ParseInt(v.UpdatedAt, 10, 64)
+				c, _ := strconv.ParseInt(v.AddedAt, 10, 64)
+				fmt.Printf("%-50s (%4s)\tCreated on %s\tUpdated on %s\n", v.Title, v.Media.VideoResolution, time.Unix(c, 0).Format("01/02/2006"), time.Unix(u, 0).Format("01/02/2006"))
 			}
 		}
+		fmt.Printf("\nMedia Container Size:\t%s\n", result.Size)
+		fmt.Printf("SD Count:\t%d\n", updated)
 	}
 }
 
