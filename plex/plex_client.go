@@ -3,19 +3,66 @@ package plex
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
+	"runtime"
 )
 
+const (
+	plexURL         = "https://plex.tv"
+	applicationXml  = "application/xml"
+	applicationJson = "application/json"
+)
+
+// Plex contains fields that are required to make
+// an api call to your plex server
 type Plex struct {
-	ServerUrl string
-	Token     string
+	URL              string
+	Token            string
+	ClientIdentifier string
+	Headers          headers
+	HTTPClient       http.Client
+	DownloadClient   http.Client
 }
 
-func (c Plex) GetAllMovies() (movies []Video, err error) {
+type headers struct {
+	Platform               string
+	PlatformVersion        string
+	Provides               string
+	Product                string
+	Version                string
+	Device                 string
+	ContainerSize          string
+	ContainerStart         string
+	Token                  string
+	Accept                 string
+	ContentType            string
+	ClientIdentifier       string
+	TargetClientIdentifier string
+}
+
+func (c *Plex) GetAllMovies() (movies []Video, err error) {
 	return nil, errors.New("function not implemented")
 }
 
-func (c Plex) GetAllShows() (movies []Video, err error) {
+func (c *Plex) GetAllShows() (movies []Video, err error) {
 	return nil, errors.New("function not implemented")
+}
+
+func defaultHeaders() headers {
+	version := "0.0.1"
+
+	return headers{
+		Platform:         runtime.GOOS,
+		PlatformVersion:  "0.0.0",
+		Product:          "Go Plex Client",
+		Version:          version,
+		Device:           runtime.GOOS + " " + runtime.GOARCH,
+		ClientIdentifier: "go-plex-client-v" + version,
+		ContainerSize:    "Plex-Container-Size=50",
+		ContainerStart:   "X-Plex-Container-Start=0",
+		Accept:           applicationJson,
+		ContentType:      applicationJson,
+	}
 }
 
 type Response struct {
