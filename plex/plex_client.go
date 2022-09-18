@@ -8,8 +8,6 @@ import (
 )
 
 const (
-	plexURL         = "https://plex.tv"
-	applicationXml  = "application/xml"
 	applicationJson = "application/json"
 )
 
@@ -21,7 +19,6 @@ type Plex struct {
 	ClientIdentifier string
 	Headers          headers
 	HTTPClient       http.Client
-	DownloadClient   http.Client
 }
 
 type headers struct {
