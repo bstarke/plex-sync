@@ -35,14 +35,13 @@ func run() {
 	if err != nil {
 		fmt.Printf("error: %v", err)
 	}
-	writeCsvFile(videos)
-	//for index, video := range videos {
-	//	if index >= 0 {
-	//		//IMDB ID's Only
-	//		fmt.Printf("%v - %v\n", index+1, getImdbId(video.Media[0].Part[0].File))
-	//	}
-	//}
+	writeCsvFile(videos, "movies.csv")
 	fmt.Printf("Total Movies,%v", len(videos))
+	videos, err = p.GetAllShows()
+	if err != nil {
+		fmt.Printf("error: %v", err)
+	}
+	writeCsvFile(videos, "shows.csv")
 }
 
 func getImdbId(filename string) string {
@@ -66,8 +65,8 @@ func getImdbId(filename string) string {
 	return ""
 }
 
-func writeCsvFile(videos []plex2.Video) {
-	f, err := os.Create("movies.csv")
+func writeCsvFile(videos []plex2.Video, filename string) {
+	f, err := os.Create(filename)
 	if err != nil {
 		fmt.Printf("error opening file")
 	}
