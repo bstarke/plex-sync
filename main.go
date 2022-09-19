@@ -87,7 +87,13 @@ func writeCsvFile(videos []plex2.Video, filename string) {
 			} else {
 				format = "Widescreen"
 			}
-			w.WriteString(fmt.Sprintf("\"%v\",%v,%v,%v,%v\n", video.Title, video.Year, getImdbId(video.Media[0].Part[0].File), res, format))
+			var title string
+			if video.GrandparentTitle != "" {
+				title = fmt.Sprintf("%v - %v - %v", video.GrandparentTitle, video.ParentTitle, video.Title)
+			} else {
+				title = video.Title
+			}
+			w.WriteString(fmt.Sprintf("\"%v\",%v,%v,%v,%v\n", title, video.Year, getImdbId(video.Media[0].Part[0].File), res, format))
 		}
 	}
 	w.Flush()

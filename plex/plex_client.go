@@ -12,7 +12,7 @@ import (
 
 const (
 	applicationJson = "application/json"
-	libraryPath     = `%s/library/sections/%s/all`
+	libraryPath     = `/library/sections/%s/all`
 )
 
 // Plex contains fields that are required to make
@@ -95,12 +95,12 @@ func (p *Plex) GetLibraries() (dirs []Directory, err error) {
 }
 
 func (p *Plex) GetAllMovies() (movies []Video, err error) {
-	movies, err = p.GetVideos("1")
+	movies, err = p.GetVideos(fmt.Sprintf(libraryPath, "1"))
 	return
 }
 
-func (p *Plex) GetAllShows() (movies []Video, err error) {
-	movies, err = p.GetVideos("2")
+func (p *Plex) GetAllShows() (shows []Video, err error) {
+	shows, err = p.GetVideos(fmt.Sprintf(libraryPath, "2"))
 	return
 }
 
@@ -109,7 +109,7 @@ func (p *Plex) GetVideos(key string) ([]Video, error) {
 		return []Video{}, errors.New("key is required")
 	}
 	var results Response
-	query := fmt.Sprintf(libraryPath, p.URL, key)
+	query := fmt.Sprintf("%s%s", p.URL, key)
 	resp, err := p.get(query, p.Headers)
 	if err != nil {
 		return []Video{}, err
@@ -121,7 +121,16 @@ func (p *Plex) GetVideos(key string) ([]Video, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
 		return []Video{}, err
 	}
-	return results.MediaContainer.Videos, nil
+	var vids []Video
+	if results.MediaContainer.Videos[0].Media == nil {
+		for _, video := range results.MediaContainer.Videos {
+			vidlist, _ := p.GetVideos(video.Key)
+			vids = append(vids, vidlist...)
+		}
+	} else {
+		vids = results.MediaContainer.Videos
+	}
+	return vids, nil
 }
 
 func defaultHeaders() headers {
@@ -188,6 +197,8 @@ type Video struct {
 	GUID                  string       `json:"guid"`
 	Studio                string       `json:"studio"`
 	Type                  string       `json:"type"`
+	GrandparentTitle      string       `json:"grandparentTitle"`
+	ParentTitle           string       `json:"parentTitle"`
 	Title                 string       `json:"title"`
 	ContentRating         string       `json:"contentRating"`
 	Summary               string       `json:"summary"`
