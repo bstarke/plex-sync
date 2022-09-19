@@ -1,15 +1,12 @@
 package main
 
 import (
-	"encoding/xml"
+	"bufio"
 	"fmt"
 	"github.com/spf13/viper"
-	"io"
-	"log"
-	"net/http"
-	"strconv"
+	"os"
+	plex2 "plex-sync/plex"
 	"strings"
-	"time"
 )
 
 func main() {
@@ -31,44 +28,21 @@ func setup() {
 
 func run() {
 	setup()
-	url := fmt.Sprintf("%s://%s:32400/library/sections/1/all?X-Plex-Token=%s", viper.Get("plex.protocol"),
-		viper.Get("plex.host"), viper.Get("plex.token"))
-	if xmlBytes, err := getXML(url); err != nil {
-		log.Fatalf("Failed to get XML: %v", err)
-	} else {
-		var result MediaContainer
-		err := xml.Unmarshal(xmlBytes, &result)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		updated := 0
-		for _, v := range result.VideoList {
-			//size := float64(0)
-			//for _, part := range v.Media.PartList {
-			//	s, _ := strconv.Atoi(part.Size)
-			//	size += float64(s) / 1024 / 1024 / 1024
-			//}
-			//fmt.Printf("%s (%s) is %.2fGB\n", v.Title, v.Media.VideoResolution, size)
-			//if v.AddedAt < "1661216665" && v.UpdatedAt > "1661216665" && v.Media.VideoResolution != "1080" {
-			//	u, _ := strconv.ParseInt(v.UpdatedAt, 10, 64)
-			//	c, _ := strconv.ParseInt(v.AddedAt, 10, 64)
-			//	fmt.Printf("%50s (%4s)\tCreated on %s\tUpdated on %s\n", v.Title, v.Media.VideoResolution, time.Unix(c, 0).Format("01/02/2006"), time.Unix(u, 0).Format("01/02/2006"))
-			//	updated++
-			//}
-			//if v.Media.VideoResolution != "1080" {
-			//	updated++
-			//	fmt.Printf("%-60v (%3s)\n", v.Title, v.Media.VideoResolution)
-			//}
-			if v.UpdatedAt > "1661216665" {
-				updated++
-				u, _ := strconv.ParseInt(v.UpdatedAt, 10, 64)
-				c, _ := strconv.ParseInt(v.AddedAt, 10, 64)
-				fmt.Printf("%-50s (%4s)\tCreated on %s\tUpdated on %s\n", v.Title, v.Media.VideoResolution, time.Unix(c, 0).Format("01/02/2006"), time.Unix(u, 0).Format("01/02/2006"))
-			}
-		}
-		fmt.Printf("\nMedia Container Size:\t%s\n", result.Size)
-		fmt.Printf("SD Count:\t%d\n", updated)
+	plexHost := fmt.Sprintf("%s://%s:32400", viper.Get("local.protocol"),
+		viper.Get("local.host"))
+	p, _ := plex2.New(plexHost, viper.GetString("local.token"))
+	videos, err := p.GetAllMovies()
+	if err != nil {
+		fmt.Printf("error: %v", err)
 	}
+	writeCsvFile(videos)
+	//for index, video := range videos {
+	//	if index >= 0 {
+	//		//IMDB ID's Only
+	//		fmt.Printf("%v - %v\n", index+1, getImdbId(video.Media[0].Part[0].File))
+	//	}
+	//}
+	fmt.Printf("Total Movies,%v", len(videos))
 }
 
 func getImdbId(filename string) string {
@@ -92,36 +66,30 @@ func getImdbId(filename string) string {
 	return ""
 }
 
-func getXML(url string) ([]byte, error) {
-	resp, err := http.Get(url)
+func writeCsvFile(videos []plex2.Video) {
+	f, err := os.Create("movies.csv")
 	if err != nil {
-		return []byte{}, fmt.Errorf("GET error: %v", err)
+		fmt.Printf("error opening file")
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return []byte{}, fmt.Errorf("Status error: %v", resp.StatusCode)
+	defer f.Close()
+	w := bufio.NewWriter(f)
+	w.WriteString(fmt.Sprintf("%v,%v,%v,%v,%v\n", "Title", "Year", "ImdbId", "Resolution", "Format"))
+	for index, video := range videos {
+		if index >= 0 {
+			// CSV Format
+			var res, format string
+			if video.Media[0].VideoResolution == "1080" {
+				res = "Blu-Ray"
+			} else {
+				res = "DVD"
+			}
+			if video.Media[0].AspectRatio < 1.5 {
+				format = "Fullscreen"
+			} else {
+				format = "Widescreen"
+			}
+			w.WriteString(fmt.Sprintf("\"%v\",%v,%v,%v,%v\n", video.Title, video.Year, getImdbId(video.Media[0].Part[0].File), res, format))
+		}
 	}
-
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return []byte{}, fmt.Errorf("Read body: %v", err)
-	}
-
-	return data, nil
-}
-
-func sendImdbID(imdbID string) {
-	url := fmt.Sprintf("%s://%s/v1/plex/%s", viper.Get("movies.protocol"), viper.Get("movies.host"), imdbID)
-	resp, err := http.Post(url, "application/json", nil)
-	if err != nil {
-		log.Printf("Error posting to API : %s -> %s", imdbID, err)
-		return
-	}
-	if resp.StatusCode != 201 {
-		log.Printf("Error posting to API : %s", imdbID)
-		log.Printf("Status Code : %d", resp.StatusCode)
-	} else {
-		log.Printf("%s sent to api", imdbID)
-	}
+	w.Flush()
 }

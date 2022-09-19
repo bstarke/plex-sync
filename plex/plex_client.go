@@ -3,12 +3,16 @@ package plex
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
+	"net/url"
 	"runtime"
+	"time"
 )
 
 const (
 	applicationJson = "application/json"
+	libraryPath     = `%s/library/sections/%s/all`
 )
 
 // Plex contains fields that are required to make
@@ -37,12 +41,87 @@ type headers struct {
 	TargetClientIdentifier string
 }
 
-func (c *Plex) GetAllMovies() (movies []Video, err error) {
-	return nil, errors.New("function not implemented")
+func New(baseUrl, token string) (*Plex, error) {
+	var p Plex
+	if baseUrl == "" || token == "" {
+		return &p, errors.New("url & Token are Required")
+	}
+	p.HTTPClient = http.Client{
+		Timeout: 3 * time.Second,
+	}
+	p.Headers = defaultHeaders()
+	p.ClientIdentifier = p.Headers.ClientIdentifier
+	p.Headers.ClientIdentifier = p.ClientIdentifier
+	_, err := url.ParseRequestURI(baseUrl)
+	if err != nil {
+		return &p, err
+	}
+	p.URL = baseUrl
+	p.Token = token
+	return &p, nil
 }
 
-func (c *Plex) GetAllShows() (movies []Video, err error) {
-	return nil, errors.New("function not implemented")
+func (p *Plex) get(query string, h headers) (*http.Response, error) {
+	client := p.HTTPClient
+	req, reqErr := http.NewRequest("GET", query, nil)
+	if reqErr != nil {
+		return &http.Response{}, reqErr
+	}
+	p.addHeaders(req, h)
+	resp, err := client.Do(req)
+	if err != nil {
+		return &http.Response{}, err
+	}
+	return resp, nil
+}
+
+func (p *Plex) GetLibraries() (dirs []Directory, err error) {
+	query := fmt.Sprintf("%s/library/sections", p.URL)
+	resp, err := p.get(query, p.Headers)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return dirs, errors.New(resp.Status)
+	}
+	var result Response
+	if err = json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	dirs = result.MediaContainer.Directory
+	return
+}
+
+func (p *Plex) GetAllMovies() (movies []Video, err error) {
+	movies, err = p.GetVideos("1")
+	return
+}
+
+func (p *Plex) GetAllShows() (movies []Video, err error) {
+	movies, err = p.GetVideos("2")
+	return
+}
+
+func (p *Plex) GetVideos(key string) ([]Video, error) {
+	if key == "" {
+		return []Video{}, errors.New("key is required")
+	}
+	var results Response
+	query := fmt.Sprintf(libraryPath, p.URL, key)
+	resp, err := p.get(query, p.Headers)
+	if err != nil {
+		return []Video{}, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return []Video{}, fmt.Errorf("server error: %v", resp.Status)
+	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
+		return []Video{}, err
+	}
+	return results.MediaContainer.Videos, nil
 }
 
 func defaultHeaders() headers {
@@ -62,8 +141,26 @@ func defaultHeaders() headers {
 	}
 }
 
+func (p *Plex) addHeaders(req *http.Request, h headers) {
+	req.Header.Add("Accept", h.Accept)
+	req.Header.Add("X-Plex-Platform", h.Platform)
+	req.Header.Add("X-Plex-Platform-Version", h.PlatformVersion)
+	req.Header.Add("X-Plex-Provides", h.Provides)
+	req.Header.Add("X-Plex-Client-Identifier", p.ClientIdentifier)
+	req.Header.Add("X-Plex-Product", h.Product)
+	req.Header.Add("X-Plex-Version", h.Version)
+	req.Header.Add("X-Plex-Device", h.Device)
+	req.Header.Add("X-Plex-Token", p.Token)
+}
+
 type Response struct {
 	MediaContainer MediaContainer `json:"MediaContainer"`
+}
+
+type LibrarySections struct {
+	MediaContainer struct {
+		Directory []Directory `json:"Directory"`
+	} `json:"MediaContainer"`
 }
 
 type MediaContainer struct {
