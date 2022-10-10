@@ -19,3 +19,5 @@ plex.xml
 *.db
 
 config.yml
+*.txt
+*.sh

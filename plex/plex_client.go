@@ -122,7 +122,7 @@ func (p *Plex) GetVideos(key string) ([]Video, error) {
 		return []Video{}, err
 	}
 	var vids []Video
-	if results.MediaContainer.Videos[0].Media == nil {
+	if results.MediaContainer.Videos[0].Type != "episode" && results.MediaContainer.Videos[0].Type != "movie" {
 		for _, video := range results.MediaContainer.Videos {
 			vidlist, _ := p.GetVideos(video.Key)
 			vids = append(vids, vidlist...)

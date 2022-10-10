@@ -6,10 +6,12 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	plex2 "plex-sync/plex"
+	"strconv"
 	"strings"
 )
 
 func main() {
+	setup()
 	run()
 }
 
@@ -27,9 +29,8 @@ func setup() {
 }
 
 func run() {
-	setup()
-	plexHost := fmt.Sprintf("%s://%s:32400", viper.Get("local.protocol"),
-		viper.Get("local.host"))
+	plexHost := fmt.Sprintf("%s://%s:%v", viper.Get("local.protocol"),
+		viper.Get("local.host"), viper.GetInt("local.port"))
 	p, _ := plex2.New(plexHost, viper.GetString("local.token"))
 	videos, err := p.GetAllMovies()
 	if err != nil {
@@ -76,11 +77,12 @@ func writeCsvFile(videos []plex2.Video, filename string) {
 	for index, video := range videos {
 		if index >= 0 {
 			// CSV Format
-			var res, format string
-			if video.Media[0].VideoResolution == "1080" {
-				res = "Blu-Ray"
+			var res int
+			var format string
+			if video.Media[0].VideoResolution == "sd" {
+				res = 480
 			} else {
-				res = "DVD"
+				res, _ = strconv.Atoi(video.Media[0].VideoResolution)
 			}
 			if video.Media[0].AspectRatio < 1.5 {
 				format = "Fullscreen"
