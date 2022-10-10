@@ -1,8 +1,26 @@
-plex:
+preferences:
+  movies:
+    resolution: "max"
+    format: "widescreen"
+  shows:
+    resolution: "480"
+    format: "any"
+  daemon:
+    cron: "11 1 * * *" # Each day at 1:11 AM https://en.wikipedia.org/wiki/Cron
+local:
   protocol: "http"
-  host: "plex.server.local"
-  token: "some-token"
-
-movies:
-  protocol: "https"
-  host: "movies-api.server.local"
+  host: "plex.mine.com"
+  port: 32400
+  token: "secret-token"
+  sftp:
+    user: "userName"
+    port: 22
+remote:
+  enabled: false
+  protocol: "http"
+  host: "plex.other.com"
+  port: 32400
+  token: "secret-token"
+  sftp:
+    user: "userName"
+    port: 22
