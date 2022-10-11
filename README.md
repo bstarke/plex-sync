@@ -8,7 +8,7 @@
   - sync : one time sync (like daemon but doesn't sleep, quits after one run)
   - csv : create csv of library
   - print : print options to screen 
-    - options: 
+    - options:
       - movies (-t, --type movies)
       - shows (-t, --type shows)
       - only resolution not = config (-q, --quality)
