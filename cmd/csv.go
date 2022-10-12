@@ -2,6 +2,18 @@ package cmd
 
 /*
 Copyright © 2022 Brad Starkenberg brad@starkenberg.net
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 */
 
 import (
@@ -9,6 +21,7 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"os"
+	"path/filepath"
 	plex2 "plex-sync/plex"
 	"strconv"
 	"strings"
@@ -17,17 +30,18 @@ import (
 )
 
 var movies, shows bool
+var dir string
 
 // csvCmd represents the csv command
 var csvCmd = &cobra.Command{
 	Use:   "csv",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Creates CSV Files from Libraries",
+	Long: `Creates CSV Files from Libraries:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+File format : "Title", "Year", "ImdbId", "Resolution", "Format"
+"Format" in the output file is Fullscreen or Widescreen
+
+Output is saved in the home directory unless the --dir -d flag contains a valid directory`,
 	Run: func(cmd *cobra.Command, args []string) {
 		plexHost := fmt.Sprintf("%s://%s:%v", viper.Get("local.protocol"),
 			viper.Get("local.host"), viper.GetInt("local.port"))
@@ -55,10 +69,15 @@ func init() {
 	rootCmd.AddCommand(csvCmd)
 	csvCmd.Flags().BoolVarP(&movies, "movies", "m", false, "only creates movies.csv")
 	csvCmd.Flags().BoolVarP(&shows, "shows", "s", false, "only creates shows.csv")
+	csvCmd.Flags().StringVarP(&dir, "dir", "d", "", "directory to save csv files")
+	csvCmd.MarkFlagsMutuallyExclusive("movies", "shows")
 }
 
 func writeCsvFile(videos []plex2.Video, filename string) {
-	f, err := os.Create(filename)
+	if len(dir) == 0 {
+		dir, _ = os.UserHomeDir()
+	}
+	f, err := os.Create(filepath.Join(dir, filename))
 	if err != nil {
 		fmt.Printf("error opening file")
 	}

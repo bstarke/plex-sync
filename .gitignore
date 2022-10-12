@@ -21,3 +21,5 @@ plex.xml
 config.yml
 *.txt
 *.sh
+
+out/
