@@ -109,6 +109,7 @@ func writeCsvFile(videos []plex2.Video, filename string) {
 		}
 	}
 	w.Flush()
+	fmt.Printf("CSV data written to %v\n", f.Name())
 }
 
 func getImdbId(filename string) string {

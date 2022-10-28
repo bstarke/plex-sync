@@ -4,8 +4,14 @@
 *.dll
 *.so
 *.dylib
-plex-sync
-plex.xml
+bin/
+out/
+
+# Actual config file with token should not be commited
+config.yml
+
+# Mac files
+.DS_Store
 
 # Test binary, build with `go test -c`
 *.test
@@ -17,9 +23,3 @@ plex.xml
 .idea/
 *.iml
 *.db
-
-config.yml
-*.txt
-*.sh
-
-out/

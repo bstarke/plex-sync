@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"runtime"
@@ -111,12 +112,52 @@ func (p *Plex) GetLibraries() (dirs []Directory, err error) {
 }
 
 func (p *Plex) GetAllMovies() (movies []Video, err error) {
-	movies, err = p.GetVideos(fmt.Sprintf(libraryPath, "1"))
+	dirs, err := p.GetLibraries()
+	movieKey := "99"
+	for _, dir := range dirs {
+		if dir.Type == "movie" {
+			movieKey = dir.Key
+		}
+	}
+	movies, err = p.GetVideos(fmt.Sprintf(libraryPath, movieKey))
 	return
 }
 
+func (p *Plex) WriteMovieJsonToFile(w io.Writer) {
+	client := p.HTTPClient
+	dirs, err := p.GetLibraries()
+	key := "99"
+	for _, dir := range dirs {
+		if dir.Type == "movie" {
+			key = dir.Key
+		}
+	}
+	query := fmt.Sprintf("%s%s", p.URL, fmt.Sprintf(libraryPath, key))
+	//fmt.Printf("Query : %v\n", query)
+	req, reqErr := http.NewRequest("GET", query, nil)
+	if reqErr != nil {
+		fmt.Printf("Error : %v\n", err)
+		return
+	}
+	p.addHeaders(req, p.Headers)
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("Error : %v\n", err)
+		return
+	}
+	defer resp.Body.Close()
+	io.Copy(w, resp.Body)
+}
+
 func (p *Plex) GetAllShows() (shows []Video, err error) {
-	shows, err = p.GetVideos(fmt.Sprintf(libraryPath, "2"))
+	dirs, err := p.GetLibraries()
+	showKey := "99"
+	for _, dir := range dirs {
+		if dir.Type == "show" {
+			showKey = dir.Key
+		}
+	}
+	shows, err = p.GetVideos(fmt.Sprintf(libraryPath, showKey))
 	return
 }
 
@@ -126,6 +167,7 @@ func (p *Plex) GetVideos(key string) ([]Video, error) {
 	}
 	var results Response
 	query := fmt.Sprintf("%s%s", p.URL, key)
+	//fmt.Printf("Query : %v\n", query)
 	resp, err := p.get(query, p.Headers)
 	if err != nil {
 		return []Video{}, err
