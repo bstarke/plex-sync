@@ -1,0 +1,117 @@
+{
+    "MediaContainer": {
+        "size": 1,
+        "allowSync": true,
+        "art": "/:/resources/movie-fanart.jpg",
+        "identifier": "com.plexapp.plugins.library",
+        "librarySectionID": 1,
+        "librarySectionTitle": "Movies",
+        "librarySectionUUID": "ea10fae9-1331-45dd-bc2f-a944988952a5",
+        "mediaTagPrefix": "/system/bundle/media/flags/",
+        "mediaTagVersion": 1667296136,
+        "thumb": "/:/resources/movie.png",
+        "title1": "Movies",
+        "title2": "All Movies",
+        "viewGroup": "movie",
+        "viewMode": 65592,
+        "Metadata": [
+            {
+                "ratingKey": "14185",
+                "key": "/library/metadata/14185",
+                "guid": "plex://movie/5d7768254de0ee001fcc83a5",
+                "studio": "20th Century Fox",
+                "type": "movie",
+                "title": "Alien",
+                "contentRating": "R",
+                "summary": "During its return to the earth, commercial spaceship Nostromo intercepts a distress signal from a distant planet. When a three-member team of the crew discovers a chamber containing thousands of eggs on the planet, a creature inside one of the eggs attacks an explorer. The entire crew is unaware of the impending nightmare set to descend upon them when the alien parasite planted inside its unfortunate host is birthed.",
+                "audienceRating": 8.5,
+                "viewCount": 1,
+                "lastViewedAt": 1664491447,
+                "year": 1979,
+                "tagline": "In space no one can hear you scream.",
+                "thumb": "/library/metadata/14185/thumb/1669837431",
+                "art": "/library/metadata/14185/art/1669837431",
+                "duration": 6997657,
+                "originallyAvailableAt": "1979-05-28",
+                "addedAt": 1664245653,
+                "updatedAt": 1669837431,
+                "audienceRatingImage": "imdb://image.rating",
+                "chapterSource": "media",
+                "hasPremiumPrimaryExtra": "1",
+                "Media": [
+                    {
+                        "id": 32638,
+                        "duration": 6997657,
+                        "bitrate": 7875,
+                        "width": 1920,
+                        "height": 820,
+                        "aspectRatio": 2.35,
+                        "audioChannels": 6,
+                        "audioCodec": "ac3",
+                        "videoCodec": "h264",
+                        "videoResolution": "1080",
+                        "container": "mp4",
+                        "videoFrameRate": "24p",
+                        "optimizedForStreaming": 0,
+                        "has64bitOffsets": true,
+                        "videoProfile": "constrained baseline",
+                        "Part": [
+                            {
+                                "id": 66829,
+                                "key": "/library/parts/66829/1664243870/file.mp4",
+                                "duration": 6997657,
+                                "file": "/home/plex/movies/Alien (1979) {imdb-tt0078748}/Alien (1979) {imdb-tt0078748}.mp4",
+                                "size": 6890948704,
+                                "container": "mp4",
+                                "has64bitOffsets": true,
+                                "hasThumbnail": "1",
+                                "optimizedForStreaming": false,
+                                "videoProfile": "constrained baseline"
+                            }
+                        ]
+                    }
+                ],
+                "Genre": [
+                    {
+                        "tag": "Science Fiction"
+                    },
+                    {
+                        "tag": "Horror"
+                    }
+                ],
+                "Director": [
+                    {
+                        "tag": "Ridley Scott"
+                    }
+                ],
+                "Writer": [
+                    {
+                        "tag": "Dan O'Bannon"
+                    },
+                    {
+                        "tag": "Ronald Shusett"
+                    }
+                ],
+                "Country": [
+                    {
+                        "tag": "United States of America"
+                    },
+                    {
+                        "tag": "United Kingdom"
+                    }
+                ],
+                "Role": [
+                    {
+                        "tag": "Tom Skerritt"
+                    },
+                    {
+                        "tag": "Sigourney Weaver"
+                    },
+                    {
+                        "tag": "Veronica Cartwright"
+                    }
+                ]
+            }
+        ]
+    }
+}

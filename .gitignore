@@ -5,7 +5,6 @@
 *.so
 *.dylib
 bin/
-test_data/
 
 # Actual config file with token should not be commited
 config.yml

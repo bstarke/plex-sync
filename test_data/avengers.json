@@ -1,0 +1,398 @@
+{
+    "MediaContainer": {
+        "size": 1965,
+        "allowSync": true,
+        "art": "/:/resources/movie-fanart.jpg",
+        "identifier": "com.plexapp.plugins.library",
+        "librarySectionID": 1,
+        "librarySectionTitle": "Movies",
+        "librarySectionUUID": "ea10fae9-1331-45dd-bc2f-a944988952a5",
+        "mediaTagPrefix": "/system/bundle/media/flags/",
+        "mediaTagVersion": 1667296136,
+        "thumb": "/:/resources/movie.png",
+        "title1": "Movies",
+        "title2": "All Movies",
+        "viewGroup": "movie",
+        "viewMode": 65592,
+        "Metadata": [
+            {
+                "ratingKey": "9271",
+                "key": "/library/metadata/9271",
+                "guid": "plex://movie/5d77684d61141d001fb181b9",
+                "studio": "Marvel Studios",
+                "type": "movie",
+                "title": "The Avengers",
+                "titleSort": "Avengers",
+                "contentRating": "PG-13",
+                "summary": "When an unexpected enemy emerges and threatens global safety and security, Nick Fury, director of the international peacekeeping agency known as S.H.I.E.L.D., finds himself in need of a team to pull the world back from the brink of disaster. Spanning the globe, a daring recruitment effort begins!",
+                "audienceRating": 8.0,
+                "year": 2012,
+                "tagline": "Some assembly required.",
+                "thumb": "/library/metadata/9271/thumb/1669837446",
+                "art": "/library/metadata/9271/art/1669837446",
+                "duration": 8568511,
+                "originallyAvailableAt": "2012-04-25",
+                "addedAt": 1663125795,
+                "updatedAt": 1669837446,
+                "audienceRatingImage": "imdb://image.rating",
+                "hasPremiumExtras": "1",
+                "hasPremiumPrimaryExtra": "1",
+                "Media": [
+                    {
+                        "id": 21707,
+                        "duration": 8568511,
+                        "bitrate": 1327,
+                        "width": 720,
+                        "height": 406,
+                        "aspectRatio": 1.78,
+                        "audioChannels": 2,
+                        "audioCodec": "aac",
+                        "videoCodec": "h264",
+                        "videoResolution": "sd",
+                        "container": "mp4",
+                        "videoFrameRate": "NTSC",
+                        "optimizedForStreaming": 0,
+                        "audioProfile": "lc",
+                        "has64bitOffsets": false,
+                        "videoProfile": "main",
+                        "Part": [
+                            {
+                                "id": 65683,
+                                "key": "/library/parts/65683/1636591145/file.mp4",
+                                "duration": 8568511,
+                                "file": "/home/plex/movies/The Avengers (2012) {imdb-tt0848228}/The Avengers (2012) {imdb-tt0848228}.mp4",
+                                "size": 1428902640,
+                                "audioProfile": "lc",
+                                "container": "mp4",
+                                "has64bitOffsets": false,
+                                "optimizedForStreaming": false,
+                                "videoProfile": "main"
+                            }
+                        ]
+                    }
+                ],
+                "Genre": [
+                    {
+                        "tag": "Action"
+                    },
+                    {
+                        "tag": "Adventure"
+                    }
+                ],
+                "Director": [
+                    {
+                        "tag": "Joss Whedon"
+                    }
+                ],
+                "Writer": [
+                    {
+                        "tag": "Stan Lee"
+                    },
+                    {
+                        "tag": "Joss Whedon"
+                    }
+                ],
+                "Country": [
+                    {
+                        "tag": "United States of America"
+                    }
+                ],
+                "Role": [
+                    {
+                        "tag": "Robert Downey Jr."
+                    },
+                    {
+                        "tag": "Chris Evans"
+                    },
+                    {
+                        "tag": "Mark Ruffalo"
+                    }
+                ]
+            },
+            {
+                "ratingKey": "1055",
+                "key": "/library/metadata/1055",
+                "guid": "plex://movie/5d77690623d5a3001f4f4ab6",
+                "studio": "Marvel Studios",
+                "type": "movie",
+                "title": "Avengers: Age of Ultron",
+                "contentRating": "PG-13",
+                "summary": "When Tony Stark and Bruce Banner try to jump-start a dormant peacekeeping program called Ultron, things go horribly wrong and it's up to Earth's mightiest heroes to stop the villainous Ultron from enacting his terrible plan.",
+                "audienceRating": 7.3,
+                "year": 2015,
+                "tagline": "A New Age Has Come.",
+                "thumb": "/library/metadata/1055/thumb/1669837446",
+                "art": "/library/metadata/1055/art/1669837446",
+                "duration": 8471475,
+                "originallyAvailableAt": "2015-04-22",
+                "addedAt": 1662993321,
+                "updatedAt": 1669837446,
+                "audienceRatingImage": "imdb://image.rating",
+                "hasPremiumExtras": "1",
+                "hasPremiumPrimaryExtra": "1",
+                "Media": [
+                    {
+                        "id": 2544,
+                        "duration": 8471475,
+                        "bitrate": 1327,
+                        "width": 640,
+                        "height": 360,
+                        "aspectRatio": 1.78,
+                        "audioChannels": 2,
+                        "audioCodec": "aac",
+                        "videoCodec": "mpeg4",
+                        "videoResolution": "sd",
+                        "container": "mp4",
+                        "videoFrameRate": "24p",
+                        "optimizedForStreaming": 0,
+                        "audioProfile": "lc",
+                        "has64bitOffsets": false,
+                        "videoProfile": "simple scalable",
+                        "Part": [
+                            {
+                                "id": 66784,
+                                "key": "/library/parts/66784/1444523712/file.mp4",
+                                "duration": 8471475,
+                                "file": "/home/plex/movies/Avengers Age of Ultron (2015) {imdb-tt2395427}/Avengers Age of Ultron (2015) {imdb-tt2395427}.mp4",
+                                "size": 1410200695,
+                                "audioProfile": "lc",
+                                "container": "mp4",
+                                "has64bitOffsets": false,
+                                "optimizedForStreaming": false,
+                                "videoProfile": "simple scalable"
+                            }
+                        ]
+                    }
+                ],
+                "Genre": [
+                    {
+                        "tag": "Action"
+                    },
+                    {
+                        "tag": "Adventure"
+                    }
+                ],
+                "Director": [
+                    {
+                        "tag": "Joss Whedon"
+                    }
+                ],
+                "Writer": [
+                    {
+                        "tag": "Joss Whedon"
+                    }
+                ],
+                "Country": [
+                    {
+                        "tag": "United States of America"
+                    }
+                ],
+                "Role": [
+                    {
+                        "tag": "Robert Downey Jr."
+                    },
+                    {
+                        "tag": "Chris Hemsworth"
+                    },
+                    {
+                        "tag": "Mark Ruffalo"
+                    }
+                ]
+            },
+            {
+                "ratingKey": "17488",
+                "key": "/library/metadata/17488",
+                "guid": "plex://movie/5d776b37fb0d55001f56046d",
+                "studio": "Marvel Studios",
+                "type": "movie",
+                "title": "Avengers: Endgame",
+                "contentRating": "PG-13",
+                "summary": "After the devastating events of Avengers: Infinity War (2018), the universe is in ruins. With the help of remaining allies, the Avengers assemble once more in order to reverse Thanos' actions and restore balance to the universe.",
+                "audienceRating": 8.4,
+                "year": 2019,
+                "tagline": "Avenge the fallen.",
+                "thumb": "/library/metadata/17488/thumb/1669837447",
+                "art": "/library/metadata/17488/art/1669837447",
+                "duration": 10868608,
+                "originallyAvailableAt": "2019-04-24",
+                "addedAt": 1666322749,
+                "updatedAt": 1669837447,
+                "audienceRatingImage": "imdb://image.rating",
+                "hasPremiumExtras": "1",
+                "hasPremiumPrimaryExtra": "1",
+                "Media": [
+                    {
+                        "id": 40098,
+                        "duration": 10868608,
+                        "bitrate": 3688,
+                        "width": 1280,
+                        "height": 720,
+                        "aspectRatio": 1.78,
+                        "audioChannels": 2,
+                        "audioCodec": "aac",
+                        "videoCodec": "h264",
+                        "videoResolution": "720",
+                        "container": "mp4",
+                        "videoFrameRate": "24p",
+                        "optimizedForStreaming": 1,
+                        "audioProfile": "lc",
+                        "has64bitOffsets": true,
+                        "videoProfile": "high",
+                        "Part": [
+                            {
+                                "id": 66847,
+                                "key": "/library/parts/66847/1666320216/file.mp4",
+                                "duration": 10868608,
+                                "file": "/home/plex/movies/Avengers End Game (2019) {imdb-tt4154796}/Avengers End Game (2019) {imdb-tt4154796}.mp4",
+                                "size": 5037839086,
+                                "audioProfile": "lc",
+                                "container": "mp4",
+                                "has64bitOffsets": true,
+                                "hasThumbnail": "1",
+                                "optimizedForStreaming": true,
+                                "videoProfile": "high"
+                            }
+                        ]
+                    }
+                ],
+                "Genre": [
+                    {
+                        "tag": "Action"
+                    },
+                    {
+                        "tag": "Adventure"
+                    }
+                ],
+                "Director": [
+                    {
+                        "tag": "Anthony Russo"
+                    },
+                    {
+                        "tag": "Joe Russo"
+                    }
+                ],
+                "Writer": [
+                    {
+                        "tag": "Christopher Markus"
+                    },
+                    {
+                        "tag": "Stephen McFeely"
+                    }
+                ],
+                "Country": [
+                    {
+                        "tag": "United States of America"
+                    }
+                ],
+                "Role": [
+                    {
+                        "tag": "Robert Downey Jr."
+                    },
+                    {
+                        "tag": "Chris Evans"
+                    },
+                    {
+                        "tag": "Mark Ruffalo"
+                    }
+                ]
+            },
+            {
+                "ratingKey": "1152",
+                "key": "/library/metadata/1152",
+                "guid": "plex://movie/5d776b377a53e9001e71e283",
+                "studio": "Marvel Studios",
+                "type": "movie",
+                "title": "Avengers: Infinity War",
+                "contentRating": "PG-13",
+                "summary": "The Avengers and their allies must be willing to sacrifice all in an attempt to defeat the powerful Thanos before his blitz of devastation and ruin puts an end to the universe.",
+                "audienceRating": 8.4,
+                "year": 2018,
+                "tagline": "An entire universe. Once and for all.",
+                "thumb": "/library/metadata/1152/thumb/1669837447",
+                "art": "/library/metadata/1152/art/1669837447",
+                "duration": 8960501,
+                "originallyAvailableAt": "2018-04-25",
+                "addedAt": 1662997118,
+                "updatedAt": 1669837447,
+                "audienceRatingImage": "imdb://image.rating",
+                "chapterSource": "media",
+                "hasPremiumExtras": "1",
+                "hasPremiumPrimaryExtra": "1",
+                "Media": [
+                    {
+                        "id": 2729,
+                        "duration": 8960501,
+                        "bitrate": 3281,
+                        "width": 852,
+                        "height": 480,
+                        "aspectRatio": 1.78,
+                        "audioChannels": 6,
+                        "audioCodec": "aac",
+                        "videoCodec": "h264",
+                        "videoResolution": "480",
+                        "container": "mp4",
+                        "videoFrameRate": "NTSC",
+                        "optimizedForStreaming": 1,
+                        "audioProfile": "lc",
+                        "has64bitOffsets": false,
+                        "videoProfile": "high",
+                        "Part": [
+                            {
+                                "id": 66820,
+                                "key": "/library/parts/66820/1650301276/file.mp4",
+                                "duration": 8960501,
+                                "file": "/home/plex/movies/Avengers Infinity War (2018) {imdb-tt4154756}/Avengers Infinity War (2018) {imdb-tt4154756}.mp4",
+                                "size": 3684825907,
+                                "audioProfile": "lc",
+                                "container": "mp4",
+                                "has64bitOffsets": false,
+                                "optimizedForStreaming": true,
+                                "videoProfile": "high"
+                            }
+                        ]
+                    }
+                ],
+                "Genre": [
+                    {
+                        "tag": "Action"
+                    },
+                    {
+                        "tag": "Adventure"
+                    }
+                ],
+                "Director": [
+                    {
+                        "tag": "Anthony Russo"
+                    },
+                    {
+                        "tag": "Joe Russo"
+                    }
+                ],
+                "Writer": [
+                    {
+                        "tag": "Christopher Markus"
+                    },
+                    {
+                        "tag": "Stephen McFeely"
+                    }
+                ],
+                "Country": [
+                    {
+                        "tag": "United States of America"
+                    }
+                ],
+                "Role": [
+                    {
+                        "tag": "Robert Downey Jr."
+                    },
+                    {
+                        "tag": "Chris Hemsworth"
+                    },
+                    {
+                        "tag": "Mark Ruffalo"
+                    }
+                ]
+            }
+        ]
+    }
+}
