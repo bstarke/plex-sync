@@ -22,7 +22,7 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
-	plex2 "plex-sync/plex"
+	"plex-sync/plex"
 	"strconv"
 	"strings"
 
@@ -45,7 +45,7 @@ Output is saved in the home directory unless the --dir -d flag contains a valid 
 	Run: func(cmd *cobra.Command, args []string) {
 		plexHost := fmt.Sprintf("%s://%s:%v", viper.Get("local.protocol"),
 			viper.Get("local.host"), viper.GetInt("local.port"))
-		p, _ := plex2.New(plexHost, viper.GetString("local.token"))
+		p, _ := plex.New(plexHost, viper.GetString("local.token"))
 		if !shows {
 			videos, err := p.GetAllMovies()
 			if err != nil {
@@ -73,7 +73,7 @@ func init() {
 	csvCmd.MarkFlagsMutuallyExclusive("movies", "shows")
 }
 
-func writeCsvFile(videos []plex2.Video, filename string) {
+func writeCsvFile(videos []plex.Video, filename string) {
 	if len(dir) == 0 {
 		dir, _ = os.UserHomeDir()
 	}
