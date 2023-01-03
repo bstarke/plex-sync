@@ -20,28 +20,33 @@ import (
 	"gorm.io/gorm"
 )
 
-type User struct {
+type Server struct {
 	gorm.Model
-	UserName string
-	HostName string
+	HostName string `gorm:"uniqueIndex:idx_servers"`
 	Videos   []Video
 }
 
 type Video struct {
 	gorm.Model
-	UserID      uint   `gorm:"uniqueIndex:idx_videos"`
-	PlexGuid    string `gorm:"uniqueIndex:idx_videos"`
-	Title       string
-	Type        string
-	Year        int
-	AspectRatio float32 // > 1.5 = widescreen
-	Files       []VideoFile
+	ServerID uint   `gorm:"uniqueIndex:idx_videos"`
+	PlexGuid string `gorm:"uniqueIndex:idx_videos"`
+	Title    string
+	Type     string
+	Year     int
+	Files    []VideoFile
 }
 
 type VideoFile struct {
 	gorm.Model
-	VideoID    uint `gorm:"index:idx_files"`
-	FileName   string
-	Size       int
-	Resolution int
+	VideoID     uint `gorm:"index:idx_files"`
+	Resolution  int
+	AspectRatio float32 // > 1.5 = widescreen
+	Parts       []VideoFilePart
+}
+
+type VideoFilePart struct {
+	gorm.Model
+	VideoFileID uint
+	FilePath    string
+	FileSize    int
 }
