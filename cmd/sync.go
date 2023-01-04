@@ -32,6 +32,20 @@ import (
 // var movie_resolution, movie_format, show_resolution, show_format string
 var localHost, remoteHost, localMoviePath, localShowPath, remoteMoviePath, remoteShowPath string
 var db *gorm.DB
+var filesSql = `SELECT s.host_name, v.type, vfp.file_path
+				  FROM video_file_parts vfp
+				 INNER JOIN video_files vf on vf.id = vfp.video_file_id
+				 INNER JOIN videos v on v.id = vf.video_id
+				 INNER JOIN servers s on s.id = v.server_id
+				 WHERE NOT EXISTS(SELECT *
+									FROM video_file_parts vfps
+								   INNER JOIN video_files vfs on vfs.id = vfps.video_file_id
+								   INNER JOIN videos vs on vs.id = vfs.video_id
+								   INNER JOIN servers ss on ss.id = vs.server_id
+								   WHERE ss.id != s.id
+									 AND vfps.file_path = vfp.file_path
+									 AND vfps.file_size = vfp.file_size)
+				ORDER BY s.host_name, v.type, vfp.file_path;`
 
 // syncCmd represents the sync command
 var syncCmd = &cobra.Command{
@@ -71,8 +85,7 @@ it will then follow the same process for shows`,
 		clearDB()
 		updateDatabaseForLocal()
 		updateDatabaseForRemote()
-		fetchMissingMovies()
-		pushMissingMovies()
+		copyFiles()
 	},
 }
 
@@ -140,12 +153,18 @@ func updateDatabaseForRemote() {
 	}
 }
 
-func fetchMissingMovies() {
+func copyFiles() {
+	rows, err := db.Raw(filesSql).Rows()
+	if err != nil {
+		log.Fatalf("Failed to get Remote Shows: %v", err)
+	}
+	defer rows.Close()
+	var files missingFiles
+	for rows.Next() {
+		rows.Scan(&files)
 
-}
-
-func pushMissingMovies() {
-
+		// do something
+	}
 }
 
 func saveVideo(pvideo plex.Video, hostName string) {
@@ -199,4 +218,10 @@ func clearDB() {
 	db.Exec("DELETE FROM video_file_parts")
 	db.Exec("DELETE FROM video_files")
 	db.Exec("DELETE FROM videos")
+}
+
+type missingFiles struct {
+	hostName  string
+	videoType string
+	filePath  string
 }
