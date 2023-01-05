@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"errors"
@@ -76,6 +76,47 @@ func checkKnownHosts() ssh.HostKeyCallback {
 
 // Put Upload file to sftp server
 func (sc *sftpClient) Put(localFile, remoteFile string) (err error) {
+	srcFile, err := os.Open(localFile)
+	if err != nil {
+		return
+	}
+	defer srcFile.Close()
+
+	// Make remote directories recursion
+	parent := filepath.Dir(remoteFile)
+	err = sc.MkdirAll(parent)
+	if err != nil {
+		log.Printf("Error creating path : %v\tError : %v\n", parent, err)
+	}
+	err = sc.Chown(parent, 998, 998) //998 = plex on my server, not sure how to make this dynamic
+	if err != nil {
+		log.Printf("Error setting owner : %v\n", err)
+	}
+	err = sc.Chmod(parent, 0775)
+	if err != nil {
+		log.Printf("Error setting mode : %v\n", err)
+	}
+
+	dstFile, err := sc.Create(remoteFile)
+	if err != nil {
+		log.Printf("Error creating file : %v\tError : %v\n", remoteFile, err)
+		return
+	}
+	defer dstFile.Close()
+	err = dstFile.Chmod(os.FileMode(0664))
+	if err != nil {
+		log.Printf("Error setting mode : %v\n", err)
+		return
+	}
+	err = dstFile.Chown(998, 998) //998 = plex on my server, not sure how to make this dynamic
+	if err != nil {
+		log.Printf("Error setting owner : %v\n", err)
+	}
+	_, err = io.Copy(dstFile, srcFile)
+	return
+} // Put Upload file to sftp server
+
+func (sc *sftpClient) Get(localFile, remoteFile string) (err error) {
 	srcFile, err := os.Open(localFile)
 	if err != nil {
 		return

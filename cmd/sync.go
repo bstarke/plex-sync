@@ -23,6 +23,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"log"
+	"net"
 	"plex-sync/plex"
 	"plex-sync/repository"
 	"strconv"
@@ -30,7 +31,8 @@ import (
 )
 
 // var movie_resolution, movie_format, show_resolution, show_format string
-var localHost, remoteHost, localMoviePath, localShowPath, remoteMoviePath, remoteShowPath string
+var localHost, remoteHost, localMoviePath, localShowPath, remoteMoviePath, remoteShowPath, thisMachineName string
+var sftpl, sftpr *sftpClient
 var db *gorm.DB
 var filesSql = `SELECT s.host_name, v.type, vfp.file_path
 				  FROM video_file_parts vfp
@@ -80,8 +82,14 @@ it will then follow the same process for shows`,
 		if err != nil {
 			log.Fatalf("Failed to create tables: %v", err)
 		}
+		thisMachineName, err = GetLocalhostFQDN()
+		if err != nil {
+			log.Fatalf("unable to get this machines FQDN : %q", err)
+		}
 		localHost = viper.GetString("local.host")
 		remoteHost = viper.GetString("remote.host")
+		sftpl, _ = NewConn(viper.GetString("local.host"), viper.GetString("local.sftp.user"), viper.GetInt("local.sftp.port"))
+		sftpr, _ = NewConn(viper.GetString("remote.host"), viper.GetString("remote.sftp.user"), viper.GetInt("remote.sftp.port"))
 		clearDB()
 		updateDatabaseForLocal()
 		updateDatabaseForRemote()
@@ -91,10 +99,6 @@ it will then follow the same process for shows`,
 
 func init() {
 	rootCmd.AddCommand(syncCmd)
-	//movie_resolution = viper.GetString("preferences.movies.resolution")
-	//movie_format = viper.GetString("preferences.movies.format")
-	//show_resolution = viper.GetString("preferences.shows.resolution")
-	//show_format = viper.GetString("preferences.shows.format")
 }
 
 func updateDatabaseForLocal() {
@@ -159,11 +163,17 @@ func copyFiles() {
 		log.Fatalf("Failed to get Remote Shows: %v", err)
 	}
 	defer rows.Close()
-	var files missingFiles
+	var file missingFiles
 	for rows.Next() {
-		rows.Scan(&files)
-
+		rows.Scan(&file)
 		// do something
+		if file.hostName == localHost {
+			if localHost == thisMachineName {
+
+			}
+		} else {
+
+		}
 	}
 }
 
@@ -224,4 +234,27 @@ type missingFiles struct {
 	hostName  string
 	videoType string
 	filePath  string
+}
+
+func GetLocalhostFQDN() (fqdn string, err error) {
+	ifaces, _ := net.InterfaceAddrs()
+	for _, iface := range ifaces {
+		var addr net.IP
+		addr, _, err = net.ParseCIDR(iface.String())
+		if err != nil {
+			log.Printf("LookupIP failed: %v", err)
+			return
+		}
+		if !addr.IsLoopback() && !addr.IsLinkLocalMulticast() && !addr.IsLinkLocalUnicast() {
+			var hosts []string
+			hosts, err = net.LookupAddr(addr.String())
+			if err != nil || len(hosts) == 0 {
+				continue
+			} else {
+				fqdn = strings.Trim(hosts[0], ".")
+				return
+			}
+		}
+	}
+	return
 }
