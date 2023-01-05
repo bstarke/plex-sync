@@ -117,14 +117,14 @@ func (sc *sftpClient) Put(localFile, remoteFile string) (err error) {
 } // Put Upload file to sftp server
 
 func (sc *sftpClient) Get(localFile, remoteFile string) (err error) {
-	srcFile, err := os.Open(localFile)
+	srcFile, err := sc.Open(remoteFile)
 	if err != nil {
 		return
 	}
 	defer srcFile.Close()
 
 	// Make remote directories recursion
-	parent := filepath.Dir(remoteFile)
+	parent := filepath.Dir(localFile)
 	err = sc.MkdirAll(parent)
 	if err != nil {
 		log.Printf("Error creating path : %v\tError : %v\n", parent, err)
@@ -138,7 +138,7 @@ func (sc *sftpClient) Get(localFile, remoteFile string) (err error) {
 		log.Printf("Error setting mode : %v\n", err)
 	}
 
-	dstFile, err := sc.Create(remoteFile)
+	dstFile, err := os.Create(localFile)
 	if err != nil {
 		log.Printf("Error creating file : %v\tError : %v\n", remoteFile, err)
 		return

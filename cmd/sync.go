@@ -24,6 +24,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net"
+	"os"
 	"plex-sync/plex"
 	"plex-sync/repository"
 	"strconv"
@@ -61,39 +62,11 @@ push movies if local resolution is higher, pull movies of the preferred format,
 push copy of formats not on the remote (assumes remote is what you want as master),
 it will then follow the same process for shows`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var err error
-		db, err = gorm.Open(sqlite.Open("plex.db"), &gorm.Config{})
-		if err != nil {
-			log.Fatalf("Open DB Failed: %v", err)
-		}
-		err = db.AutoMigrate(&repository.Server{})
-		if err != nil {
-			log.Fatalf("Failed to create tables: %v", err)
-		}
-		err = db.AutoMigrate(&repository.Video{})
-		if err != nil {
-			log.Fatalf("Failed to create tables: %v", err)
-		}
-		err = db.AutoMigrate(&repository.VideoFile{})
-		if err != nil {
-			log.Fatalf("Failed to create tables: %v", err)
-		}
-		err = db.AutoMigrate(&repository.VideoFilePart{})
-		if err != nil {
-			log.Fatalf("Failed to create tables: %v", err)
-		}
-		thisMachineName, err = GetLocalhostFQDN()
-		if err != nil {
-			log.Fatalf("unable to get this machines FQDN : %q", err)
-		}
-		localHost = viper.GetString("local.host")
-		remoteHost = viper.GetString("remote.host")
-		sftpl, _ = NewConn(viper.GetString("local.host"), viper.GetString("local.sftp.user"), viper.GetInt("local.sftp.port"))
-		sftpr, _ = NewConn(viper.GetString("remote.host"), viper.GetString("remote.sftp.user"), viper.GetInt("remote.sftp.port"))
+		setup()
 		clearDB()
 		updateDatabaseForLocal()
 		updateDatabaseForRemote()
-		copyFiles()
+		copyMissingFiles()
 	},
 }
 
@@ -157,7 +130,7 @@ func updateDatabaseForRemote() {
 	}
 }
 
-func copyFiles() {
+func copyMissingFiles() {
 	rows, err := db.Raw(filesSql).Rows()
 	if err != nil {
 		log.Fatalf("Failed to get Remote Shows: %v", err)
@@ -166,15 +139,53 @@ func copyFiles() {
 	var file missingFiles
 	for rows.Next() {
 		rows.Scan(&file)
-		// do something
-		if file.hostName == localHost {
-			if localHost == thisMachineName {
-
-			}
+		destinationPath := getDestinationPath(file)
+		if localHost == thisMachineName && file.hostName != localHost {
+			sftpr.Get(destinationPath, file.filePath)
 		} else {
-
+			srcClient, dstClient := getSftpClient(file)
+			if localHost != thisMachineName {
+				tempFile, err := os.CreateTemp("/tmp", "plex")
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer os.Remove(tempFile.Name())
+				err = srcClient.Get(tempFile.Name(), file.filePath)
+				if err != nil {
+					continue
+				}
+				file.filePath = tempFile.Name()
+			}
+			err := dstClient.Put(file.filePath, destinationPath)
+			if err != nil {
+				log.Printf("Error putting file : %v", err)
+			}
 		}
 	}
+}
+
+func getDestinationPath(file missingFiles) (destinationPath string) {
+	if file.videoType == "movie" && file.hostName == localHost {
+		destinationPath = remoteMoviePath
+	} else if file.videoType == "show" && file.hostName == localHost {
+		destinationPath = remoteShowPath
+	} else if file.videoType == "movie" && file.hostName != localHost {
+		destinationPath = localMoviePath
+	} else if file.videoType == "show" && file.hostName != localHost {
+		destinationPath = localShowPath
+	}
+	return
+}
+
+func getSftpClient(file missingFiles) (srcClient *sftpClient, dstClient *sftpClient) {
+	if file.hostName == localHost {
+		dstClient = sftpr
+		srcClient = sftpl
+	} else {
+		dstClient = sftpl
+		srcClient = sftpr
+	}
+	return
 }
 
 func saveVideo(pvideo plex.Video, hostName string) {
@@ -257,4 +268,36 @@ func GetLocalhostFQDN() (fqdn string, err error) {
 		}
 	}
 	return
+}
+
+func setup() {
+	var err error
+	db, err = gorm.Open(sqlite.Open("plex.db"), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("Open DB Failed: %v", err)
+	}
+	err = db.AutoMigrate(&repository.Server{})
+	if err != nil {
+		log.Fatalf("Failed to create tables: %v", err)
+	}
+	err = db.AutoMigrate(&repository.Video{})
+	if err != nil {
+		log.Fatalf("Failed to create tables: %v", err)
+	}
+	err = db.AutoMigrate(&repository.VideoFile{})
+	if err != nil {
+		log.Fatalf("Failed to create tables: %v", err)
+	}
+	err = db.AutoMigrate(&repository.VideoFilePart{})
+	if err != nil {
+		log.Fatalf("Failed to create tables: %v", err)
+	}
+	thisMachineName, err = GetLocalhostFQDN()
+	if err != nil {
+		log.Fatalf("unable to get this machines FQDN : %q", err)
+	}
+	localHost = viper.GetString("local.host")
+	remoteHost = viper.GetString("remote.host")
+	sftpl, _ = NewConn(viper.GetString("local.host"), viper.GetString("local.sftp.user"), viper.GetInt("local.sftp.port"))
+	sftpr, _ = NewConn(viper.GetString("remote.host"), viper.GetString("remote.sftp.user"), viper.GetInt("remote.sftp.port"))
 }
