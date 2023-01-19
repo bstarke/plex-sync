@@ -241,12 +241,6 @@ func clearDB() {
 	db.Exec("DELETE FROM videos")
 }
 
-type missingFiles struct {
-	hostName  string
-	videoType string
-	filePath  string
-}
-
 func GetLocalhostFQDN() (fqdn string, err error) {
 	ifaces, _ := net.InterfaceAddrs()
 	for _, iface := range ifaces {
@@ -276,19 +270,7 @@ func setup() {
 	if err != nil {
 		log.Fatalf("Open DB Failed: %v", err)
 	}
-	err = db.AutoMigrate(&repository.Server{})
-	if err != nil {
-		log.Fatalf("Failed to create tables: %v", err)
-	}
-	err = db.AutoMigrate(&repository.Video{})
-	if err != nil {
-		log.Fatalf("Failed to create tables: %v", err)
-	}
-	err = db.AutoMigrate(&repository.VideoFile{})
-	if err != nil {
-		log.Fatalf("Failed to create tables: %v", err)
-	}
-	err = db.AutoMigrate(&repository.VideoFilePart{})
+	err = db.AutoMigrate(&repository.Server{}, &repository.Video{}, &repository.VideoFile{}, &repository.VideoFilePart{})
 	if err != nil {
 		log.Fatalf("Failed to create tables: %v", err)
 	}
@@ -300,4 +282,10 @@ func setup() {
 	remoteHost = viper.GetString("remote.host")
 	sftpl, _ = NewConn(viper.GetString("local.host"), viper.GetString("local.sftp.user"), viper.GetInt("local.sftp.port"))
 	sftpr, _ = NewConn(viper.GetString("remote.host"), viper.GetString("remote.sftp.user"), viper.GetInt("remote.sftp.port"))
+}
+
+type missingFiles struct {
+	hostName  string
+	videoType string
+	filePath  string
 }

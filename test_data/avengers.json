@@ -1,6 +1,6 @@
 {
     "MediaContainer": {
-        "size": 1965,
+        "size": 4,
         "allowSync": true,
         "art": "/:/resources/movie-fanart.jpg",
         "identifier": "com.plexapp.plugins.library",
