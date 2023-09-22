@@ -24,7 +24,6 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net"
-	"os"
 	"plex-sync/plex"
 	"plex-sync/repository"
 	"strconv"
@@ -35,7 +34,7 @@ import (
 var localHost, remoteHost, localMoviePath, localShowPath, remoteMoviePath, remoteShowPath, thisMachineName string
 var sftpl, sftpr *sftpClient
 var db *gorm.DB
-var filesSql = `SELECT s.host_name, v.type, vfp.file_path
+var filesSql = `SELECT s.host_name AS hostName, v.type AS videoType, vfp.file_path AS filePath
 				  FROM video_file_parts vfp
 				 INNER JOIN video_files vf on vf.id = vfp.video_file_id
 				 INNER JOIN videos v on v.id = vf.video_id
@@ -133,34 +132,45 @@ func updateDatabaseForRemote() {
 func copyMissingFiles() {
 	rows, err := db.Raw(filesSql).Rows()
 	if err != nil {
-		log.Fatalf("Failed to get Remote Shows: %v", err)
+		log.Fatalf("Failed FilesSQL: %v", err)
 	}
 	defer rows.Close()
-	var file missingFiles
+	var hostName, videoType, filePath string
 	for rows.Next() {
-		rows.Scan(&file)
-		destinationPath := getDestinationPath(file)
-		if localHost == thisMachineName && file.hostName != localHost {
-			sftpr.Get(destinationPath, file.filePath)
-		} else {
-			srcClient, dstClient := getSftpClient(file)
-			if localHost != thisMachineName {
-				tempFile, err := os.CreateTemp("/tmp", "plex")
-				if err != nil {
-					log.Fatal(err)
-				}
-				defer os.Remove(tempFile.Name())
-				err = srcClient.Get(tempFile.Name(), file.filePath)
-				if err != nil {
-					continue
-				}
-				file.filePath = tempFile.Name()
-			}
-			err := dstClient.Put(file.filePath, destinationPath)
-			if err != nil {
-				log.Printf("Error putting file : %v", err)
-			}
+		err = rows.Scan(&hostName, &videoType, &filePath)
+		if err != nil {
+			log.Printf("Scan Error : %v", err)
 		}
+		file := missingFiles{
+			hostName:  hostName,
+			videoType: videoType,
+			filePath:  filePath,
+		}
+		destinationPath := getDestinationPath(file)
+		srcClient, dstClient := getSftpClient(file)
+		//if localHost == thisMachineName && file.hostName != localHost {
+		//	sftpr.Get(destinationPath, file.filePath)
+		//} else {
+		//	if localHost != thisMachineName {
+		//		tempFile, err := os.CreateTemp("/tmp", "plex")
+		//		if err != nil {
+		//			log.Fatal(err)
+		//		}
+		//		//defer os.Remove(tempFile.Name())
+		//		err = srcClient.Get(tempFile.Name(), file.filePath)
+		//		if err != nil {
+		//			continue
+		//		}
+		//		file.filePath = tempFile.Name()
+		//	}
+		//workDir, _ := os.Getwd()
+		//fmt.Printf("Working Directory : %v\n", workDir)
+		fmt.Printf("scp %+v:%+v %+v:%+v/\n", srcClient.host, file.filePath, dstClient.host, destinationPath)
+		//err := dstClient.Put(file.filePath, destinationPath)
+		//if err != nil {
+		//	log.Printf("Error putting file : %v", err)
+		//}
+		//}
 	}
 }
 
@@ -191,9 +201,9 @@ func getSftpClient(file missingFiles) (srcClient *sftpClient, dstClient *sftpCli
 func saveVideo(pvideo plex.Video, hostName string) {
 	title := fmt.Sprintf("%v %v %v", pvideo.GrandparentTitle, pvideo.ParentTitle, pvideo.Title)
 	title = strings.TrimSpace(title)
-	if strings.HasPrefix(pvideo.GUID, "local://") {
-		log.Printf("Host %v has %v '%v' with plex guid '%v'", hostName, pvideo.Type, title, pvideo.GUID)
-	}
+	//if strings.HasPrefix(pvideo.GUID, "local://") {
+	//	log.Printf("Host %v has %v '%v' with plex guid '%v'", hostName, pvideo.Type, title, pvideo.GUID)
+	//}
 	var server repository.Server
 	db.FirstOrCreate(&server, repository.Server{HostName: hostName})
 	var video = repository.Video{
