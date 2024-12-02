@@ -32,7 +32,7 @@ import (
 
 // var movie_resolution, movie_format, show_resolution, show_format string
 var localHost, remoteHost, localMoviePath, localShowPath, remoteMoviePath, remoteShowPath, thisMachineName string
-var sftpl, sftpr *sftpClient
+var sftpl, sftpr *SftpClient
 var db *gorm.DB
 var filesSql = `SELECT s.host_name AS hostName, v.type AS videoType, vfp.file_path AS filePath
 				  FROM video_file_parts vfp
@@ -64,8 +64,8 @@ it will then follow the same process for shows`,
 		setup()
 		clearDB()
 		updateDatabaseForLocal()
-		updateDatabaseForRemote()
-		copyMissingFiles()
+		//updateDatabaseForRemote()
+		//copyMissingFiles()
 	},
 }
 
@@ -187,7 +187,7 @@ func getDestinationPath(file missingFiles) (destinationPath string) {
 	return
 }
 
-func getSftpClient(file missingFiles) (srcClient *sftpClient, dstClient *sftpClient) {
+func getSftpClient(file missingFiles) (srcClient *SftpClient, dstClient *SftpClient) {
 	if file.hostName == localHost {
 		dstClient = sftpr
 		srcClient = sftpl

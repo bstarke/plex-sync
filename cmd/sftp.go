@@ -13,29 +13,32 @@ import (
 	"strings"
 )
 
-type sftpClient struct {
+type SftpClient struct {
 	host, user string
 	port       int
 	*sftp.Client
 }
 
-func NewConn(host, user string, port int) (client *sftpClient, err error) {
+func NewConn(host, user string, port int) (client *SftpClient, err error) {
 	switch {
 	case `` == strings.TrimSpace(host),
 		`` == strings.TrimSpace(user),
 		0 >= port || port > 65535:
 		return nil, errors.New("invalid parameters")
 	}
-	client = &sftpClient{
+	client = &SftpClient{
 		host: host,
 		user: user,
 		port: port,
 	}
-	client.connect()
+	err = client.connect()
+	if err != nil {
+		return nil, err
+	}
 	return client, err
 }
 
-func (sc *sftpClient) connect() (err error) {
+func (sc *SftpClient) connect() (err error) {
 	privateKeyFile, err := os.Open(filepath.Join(os.Getenv("HOME"), ".ssh", "id_ed25519"))
 	if err != nil {
 		log.Panicf("error opening private key: %v", err)
@@ -75,7 +78,7 @@ func checkKnownHosts() ssh.HostKeyCallback {
 }
 
 // Put Upload file to sftp server
-func (sc *sftpClient) Put(localFile, remoteFile string) (err error) {
+func (sc *SftpClient) Put(localFile, remoteFile string) (err error) {
 	srcFile, err := os.Open(localFile)
 	if err != nil {
 		return
@@ -116,7 +119,7 @@ func (sc *sftpClient) Put(localFile, remoteFile string) (err error) {
 	return
 } // Put Upload file to sftp server
 
-func (sc *sftpClient) Get(localFile, remoteFile string) (err error) {
+func (sc *SftpClient) Get(localFile, remoteFile string) (err error) {
 	srcFile, err := sc.Open(remoteFile)
 	if err != nil {
 		return
@@ -158,7 +161,7 @@ func (sc *sftpClient) Get(localFile, remoteFile string) (err error) {
 }
 
 // PutReader Upload file to sftp server
-func (sc *sftpClient) PutReader(reader io.ReadCloser, remoteFile string) (err error) {
+func (sc *SftpClient) PutReader(reader io.ReadCloser, remoteFile string) (err error) {
 	defer reader.Close()
 	// Make remote directories recursion
 	parent := filepath.Dir(remoteFile)

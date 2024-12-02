@@ -8,6 +8,7 @@ bin/
 
 # Actual config file with token should not be commited
 config.yml
+temp/
 
 # Mac files
 .DS_Store
